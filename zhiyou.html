@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分数排行榜</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .score-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .score-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .buttons button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .buttons button:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #loginForm input {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: 200px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>分数排行榜</h1>
+        <div id="loginForm">
+            <label for="username">用户名：</label>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">密码：</label>
+            <input type="password" id="password" name="password" required><br>
+            <button onclick="login()">登录</button>
+            <button onclick="loginAsGuest()">访客</button>
+        </div>
+        <div id="scoreListContainer" style="display: none;">
+            <ul class="score-list" id="scoreList"></ul>
+            <div class="buttons">
+                <button onclick="addScore()">增加分数</button>
+                <button onclick="subtractScore()">减少分数</button>
+                <button onclick="addPerson()">增加人员</button>
+                <button onclick="subtractPerson()">减少人员</button>
+                <button onclick="goToLogin()">返回</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scores = [
+            { name: "玩家1", score: 100 },
+            { name: "玩家2", score: 90 },
+            { name: "玩家3", score: -10 }
+        ];
+
+        function renderScores() {
+            const scoreList = document.getElementById("scoreList");
+            scoreList.innerHTML = "";
+            scores.forEach((score, index) => {
+                const li = document.createElement("li");
+                li.textContent = `${index + 1}. ${score.name}: ${score.score} 分`;
+                scoreList.appendChild(li);
+            });
+        }
+
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (username === "admin" && password === "1234") {
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("scoreListContainer").style.display = "block";
+                renderScores();
+                enableButtons();
+            } else {
+                alert("登录失败，请检查用户名和密码！");
+            }
+        }
+
+        function loginAsGuest() {
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("scoreListContainer").style.display = "block";
+            renderScores();
+            disableButtons();
+        }
+
+        function enableButtons() {
+            const buttons = document.querySelectorAll(".buttons button");
+            buttons.forEach(button => {
+                button.disabled = false;
+            });
+        }
+
+        function disableButtons() {
+            const buttons = document.querySelectorAll(".buttons button:not(:last-child)");
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+        }
+
+        function addScore() {
+            const playerName = prompt("请输入要增加分数的玩家姓名:");
+            const player = scores.find(score => score.name === playerName);
+            if (player) {
+                const amount = prompt(`请输入要增加给 ${playerName} 的分数:`);
+                if (amount !== null && !isNaN(amount) && amount.trim() !== "") {
+                    const parsedAmount = parseInt(amount);
+                    player.score += parsedAmount;
+                    renderScores();
+                } else {
+                    alert("请输入有效的分数！");
+                }
+            } else {
+                alert("找不到指定的玩家！");
+            }
+        }
+
+        function subtractScore() {
+            const playerName = prompt("请输入要减少分数的玩家姓名:");
+            const player = scores.find(score => score.name === playerName);
+            if (player) {
+                const amount = prompt(`请输入要减少 ${playerName} 的分数:`);
+                if (amount !== null && !isNaN(amount) && amount.trim() !== "") {
+                    const parsedAmount = parseInt(amount);
+                    player.score -= parsedAmount;
+                    renderScores();
+                } else {
+                    alert("请输入有效的分数！");
+                }
+            } else {
+                alert("找不到指定的玩家！");
+            }
+        }
+
+        function addPerson() {
+            const playerName = prompt("请输入新增玩家姓名:");
+            if (playerName !== null && playerName.trim() !== "") {
+                const newPlayer = { name: playerName, score: 0 };
+                scores.push(newPlayer);
+                renderScores();
+            } else {
+                alert("请输入有效的玩家姓名！");
+            }
+        }
+
+        function subtractPerson() {
+            const playerName = prompt("请输入要移除的玩家姓名:");
+            if (playerName !== null && playerName.trim() !== "") {
+                const index = scores.findIndex(player => player.name === playerName);
+                if (index !== -1) {
+                    scores.splice(index, 1);
+                    renderScores();
+                } else {
+                    alert("找不到指定的玩家！");
+                }
+            } else {
+                alert("请输入有效的玩家姓名！");
+            }
+        }
+
+        function goToLogin() {
+            document.getElementById("loginForm").style.display = "block";
+            document.getElementById("scoreListContainer").style.display = "none";
+        }
+
+        window.onload = function() {
+            renderScores();
+        }
+    </script>
+</body>
+
+</html>
