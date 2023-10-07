@@ -87,6 +87,16 @@
     </div>
 
     <script>
+        fetch('https://api.myjson.com/bins/{your-json-bin-id}')
+            .then(response => response.json())
+            .then(data => {
+                // 处理从MyJSON获取的数据
+                document.getElementById('result').textContent = data.message;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        
         let scores = [
             { name: "玩家1", score: 100 },
             { name: "玩家2", score: 90 },
